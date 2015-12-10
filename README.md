@@ -2,7 +2,7 @@
 
 Programs are written for *Arduino 1.0.x.*
 
-Sample program requires the *imuFilters* library. Does not use the built in DMP of the imu but instead just gives you raw data.
+Does not use the built in DMP of the imu but instead just gives you raw data.
 
 If you have any questions, please do not hesitate to contact me.
 
