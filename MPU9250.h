@@ -1,10 +1,14 @@
+/**
+ * Invensense MPU-9250 library using the SPI interface
+ *
+ * Copyright (C) 2015 Brian Chen
+ * 
+ * Open source under the MIT License. See LICENSE.txt.
+ */
 
 #ifndef MPU9250_h
 #define MPU9250_h
 #include "Arduino.h"
- 
- 
- 
  
 // mpu9250 registers
 #define MPUREG_XG_OFFS_TC 0x00
@@ -202,29 +206,31 @@
 
 class MPU9250 {   
 public:
+    // constructor. Default low pass filter of 188Hz
     MPU9250(long clock, uint8_t cs, uint8_t low_pass_filter = BITS_DLPF_CFG_188HZ){
-        myClock = clock;
-        mycs = cs;
+        my_clock = clock;
+        my_cs = cs;
     }
-    unsigned int WriteReg( uint8_t WriteAddr, uint8_t WriteData );
-    unsigned int ReadReg( uint8_t WriteAddr, uint8_t WriteData );
-    void ReadRegs( uint8_t ReadAddr, uint8_t *ReadBuf, unsigned int Bytes );
+    unsigned int WriteReg(uint8_t WriteAddr, uint8_t WriteData );
+    unsigned int ReadReg(uint8_t WriteAddr, uint8_t WriteData );
+    void ReadRegs(uint8_t ReadAddr, uint8_t *ReadBuf, unsigned int Bytes );
  
     bool init(bool calib = true);
     void read_temp();
     void read_acc();
-    void read_rot();
+    void read_gyro();
     unsigned int set_gyro_scale(int scale);
     unsigned int set_acc_scale(int scale);
     void calib_acc();
-    void AK8963_calib_Magnetometer();
+    void calib_mag();
     void select();
     void deselect();
     unsigned int whoami();
-    uint8_t  AK8963_whoami();
-    void AK8963_read_Magnetometer();
+    uint8_t AK8963_whoami();
+    uint8_t get_CNTL1();
+    void read_mag();
     void read_all();
-    void calibrateMPU9250(float * dest1, float * dest2);
+    void calibrate(float *dest1, float *dest2);
  
     
     float acc_divider;
@@ -233,18 +239,23 @@ public:
     int calib_data[3];
     float Magnetometer_ASA[3];
  
-    float accelerometer_data[3];
-    float Temperature;
-    float gyroscope_data[3];
-    float Magnetometer[3];
+    float accel_data[3];
+    float temperature;
+    float gyro_data[3];
+    float mag_data[3];
+    int16_t mag_data_raw[3];    
 
-    float magCalibration[3] = {0, 0, 0}, magbias[3] = {0, 0, 0};  // Factory mag calibration and mag bias
-    float gyroBias[3] = {0, 0, 0}, accelBias[3] = {0, 0, 0};      // Bias corrections for gyro and accelerometer
-    
+    float randomstuff[3];   // seemed to be an issue with memory being disturbed so allocated random memory space here
+
   private:
-    long myClock;
-    uint8_t mycs;
+    long my_clock;
+    uint8_t my_cs;
     uint8_t low_pass_filter;
+
+    //float randomstuffs[3];
+
+    float g_bias[3];
+    float a_bias[3];      // Bias corrections for gyro and accelerometer
 };
  
 #endif

@@ -7,6 +7,14 @@
 #define SCK_PIN  14
 #define SS_PIN   10 
 #define INT_PIN  3
+#define LED      13
+
+#define WAITFORINPUT(){            \
+	while(!Serial.available()){};  \
+	while(Serial.available()){     \
+		Serial.read();             \
+	};                             \
+}                                  \
 
 MPU9250 mpu(SPI_CLOCK, SS_PIN);
 
@@ -17,6 +25,8 @@ void setup() {
 	Serial.begin(115200);
 
 	pinMode(INT_PIN, INPUT);
+	pinMode(LED, OUTPUT);
+	digitalWriteFast(LED, HIGH);
 
 	SPI.setSCK(SCK_PIN);
 	SPI.begin();
@@ -24,15 +34,11 @@ void setup() {
 	delay(1000);
 
 	mpu.init(true);
-	mpu.set_acc_scale(BITS_FS_2G);
-	mpu.set_gyro_scale(BITS_FS_250DPS);
+	// mpu.set_acc_scale(BITS_FS_2G);
+	// mpu.set_gyro_scale(BITS_FS_250DPS);
 
-
+	WAITFORINPUT();
 	
-	while(!Serial.available()){};
-	while(Serial.available()){
-		Serial.read();
-	};
 	uint8_t wai = mpu.whoami();
 	if (wai == 104){
 		Serial.println("Successful connection");
@@ -43,13 +49,28 @@ void setup() {
 	}
 
 	mpu.calib_acc();
+	delay(10);
 	mpu.AK8963_calib_Magnetometer();
-	deltatmicros = 0;
+
+	Serial.print(mpu.Magnetometer_ASA[0]);	Serial.print('\t');
+	Serial.print(mpu.Magnetometer_ASA[1]);	Serial.print('\t');
+	Serial.print(mpu.Magnetometer_ASA[2]);	Serial.print('\n');
+
+	WAITFORINPUT();
 }
 
 void loop() {
 	
 	mpu.read_all();
+
+	// mpu.Magnetometer[0] -= 1.515;
+	// mpu.Magnetometer[1] -= 17.175;
+	// mpu.Magnetometer[2] -= -27.39;
+
+	// mpu.Magnetometer[0] /= 89.89;
+	// mpu.Magnetometer[1] /= 105.59;
+	// mpu.Magnetometer[2] /= 96.12;
+
 
 	filter.MadgwickQuaternionUpdate(mpu.accelerometer_data[0],
 	                                mpu.accelerometer_data[1],
@@ -62,6 +83,10 @@ void loop() {
 	                                mpu.Magnetometer[2]
 	                                );
 	
+	// Serial.print((int)(mpu.Magnetometer[0]*100));        Serial.print(',');
+	// Serial.print((int)(mpu.Magnetometer[1]*100));        Serial.print(',');
+	// Serial.print((int)(mpu.Magnetometer[2]*100));        Serial.print('\n');
+
 	Serial.print(filter.yaw);        Serial.print('\t');
 	Serial.print(filter.pitch);      Serial.print('\t');
 	Serial.print(filter.roll);       Serial.print('\t');
@@ -84,4 +109,5 @@ void loop() {
 	Serial.print(mpu.Magnetometer[1]);        Serial.print('\t');
 	Serial.print(mpu.Magnetometer[2]);        Serial.print('\t');
 	Serial.println(mpu.Temperature);
+	delay(5);
 }
