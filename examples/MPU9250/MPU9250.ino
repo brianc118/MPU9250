@@ -1,8 +1,20 @@
+/**
+ * Sample program for the MPU9250 using SPI
+ *
+ * Sample rate of the AK8963 magnetometer is set at 100Hz. 
+ * There are only two options: 8Hz or 100Hz so I've set it at 100Hz
+ * in the library. This is set by writing to the CNTL1 register
+ * during initialisation.
+ *
+ * Copyright (C) 2015 Brian Chen
+ *
+ * Open source under the MIT license. See LICENSE.txt.
+ */
+
 #include <SPI.h>
-#include <imuFilters.h>
 #include <MPU9250.h>
 
-#define SPI_CLOCK 8000000
+#define SPI_CLOCK 8000000  // 8MHz clock works.
 
 #define SCK_PIN  14
 #define SS_PIN   10 
@@ -18,10 +30,7 @@
 
 MPU9250 mpu(SPI_CLOCK, SS_PIN);
 
-imuFilter filter;
-
 void setup() {
-	
 	Serial.begin(115200);
 
 	pinMode(INT_PIN, INPUT);
@@ -30,17 +39,14 @@ void setup() {
 
 	SPI.setSCK(SCK_PIN);
 	SPI.begin();
-	
-	delay(1000);
+
+	Serial.println("Press any key to continue");
+	WAITFORINPUT();
 
 	mpu.init(true);
-	// mpu.set_acc_scale(BITS_FS_2G);
-	// mpu.set_gyro_scale(BITS_FS_250DPS);
 
-	WAITFORINPUT();
-	
 	uint8_t wai = mpu.whoami();
-	if (wai == 104){
+	if (wai == 0x71){
 		Serial.println("Successful connection");
 	}
 	else{
@@ -48,66 +54,40 @@ void setup() {
 		Serial.println(wai, HEX);
 	}
 
+	uint8_t wai_AK8963 = mpu.AK8963_whoami();
+	if (wai_AK8963 == 0x48){
+		Serial.println("Successful connection to mag");
+	}
+	else{
+		Serial.print("Failed connection to mag: ");
+		Serial.println(wai_AK8963, HEX);
+	}
+
 	mpu.calib_acc();
-	delay(10);
-	mpu.AK8963_calib_Magnetometer();
+	mpu.calib_mag();
 
-	Serial.print(mpu.Magnetometer_ASA[0]);	Serial.print('\t');
-	Serial.print(mpu.Magnetometer_ASA[1]);	Serial.print('\t');
-	Serial.print(mpu.Magnetometer_ASA[2]);	Serial.print('\n');
-
+	Serial.println("Send any char to begin main loop.");
 	WAITFORINPUT();
 }
 
 void loop() {
-	
+	// various functions for reading
+	// mpu.read_mag();
+	// mpu.read_acc();
+	// mpu.read_gyro();
+
 	mpu.read_all();
 
-	// mpu.Magnetometer[0] -= 1.515;
-	// mpu.Magnetometer[1] -= 17.175;
-	// mpu.Magnetometer[2] -= -27.39;
+	Serial.print(mpu.gyro_data[0]);   Serial.print('\t');
+	Serial.print(mpu.gyro_data[1]);   Serial.print('\t');
+	Serial.print(mpu.gyro_data[2]);   Serial.print('\t');
+	Serial.print(mpu.accel_data[0]);  Serial.print('\t');
+	Serial.print(mpu.accel_data[1]);  Serial.print('\t');
+	Serial.print(mpu.accel_data[2]);  Serial.print('\t');
+	Serial.print(mpu.mag_data[0]);    Serial.print('\t');
+	Serial.print(mpu.mag_data[1]);    Serial.print('\t');
+	Serial.print(mpu.mag_data[2]);    Serial.print('\t');
+	Serial.println(mpu.temperature);
 
-	// mpu.Magnetometer[0] /= 89.89;
-	// mpu.Magnetometer[1] /= 105.59;
-	// mpu.Magnetometer[2] /= 96.12;
-
-
-	filter.MadgwickQuaternionUpdate(mpu.accelerometer_data[0],
-	                                mpu.accelerometer_data[1],
-	                                mpu.accelerometer_data[2],
-	                                mpu.gyroscope_data[0],
-	                                mpu.gyroscope_data[1],
-	                                mpu.gyroscope_data[2],
-	                                mpu.Magnetometer[0],
-	                                mpu.Magnetometer[1],
-	                                mpu.Magnetometer[2]
-	                                );
-	
-	// Serial.print((int)(mpu.Magnetometer[0]*100));        Serial.print(',');
-	// Serial.print((int)(mpu.Magnetometer[1]*100));        Serial.print(',');
-	// Serial.print((int)(mpu.Magnetometer[2]*100));        Serial.print('\n');
-
-	Serial.print(filter.yaw);        Serial.print('\t');
-	Serial.print(filter.pitch);      Serial.print('\t');
-	Serial.print(filter.roll);       Serial.print('\t');
-	
-	// Serial.print(mpu.gyroBias[0]);       Serial.print('\t');
-	// Serial.print(mpu.gyroBias[1]);       Serial.print('\t');
-	// Serial.print(mpu.gyroBias[2]);       Serial.print('\t');
-
-	// Serial.print(mpu.accelBias[0]);       Serial.print('\t');
-	// Serial.print(mpu.accelBias[1]);       Serial.print('\t');
-	// Serial.print(mpu.accelBias[2]);       Serial.print('\t');
-
-	Serial.print(mpu.accelerometer_data[0]);  Serial.print('\t');
-	Serial.print(mpu.accelerometer_data[1]);  Serial.print('\t');
-	Serial.print(mpu.accelerometer_data[2]);  Serial.print('\t');
-	Serial.print(mpu.gyroscope_data[0]);      Serial.print('\t');
-	Serial.print(mpu.gyroscope_data[1]);      Serial.print('\t');
-	Serial.print(mpu.gyroscope_data[2]);      Serial.print('\t');
-	Serial.print(mpu.Magnetometer[0]);        Serial.print('\t');
-	Serial.print(mpu.Magnetometer[1]);        Serial.print('\t');
-	Serial.print(mpu.Magnetometer[2]);        Serial.print('\t');
-	Serial.println(mpu.Temperature);
-	delay(5);
+	delay(10);
 }

@@ -18,7 +18,7 @@ unsigned int MPU9250::WriteReg( uint8_t WriteAddr, uint8_t WriteData )
     temp_val=SPI.transfer(WriteData);
     deselect();
 
-    delayMicroseconds(10);
+    delayMicroseconds(50);
     return temp_val;
 }
 unsigned int  MPU9250::ReadReg( uint8_t WriteAddr, uint8_t WriteData )
@@ -35,7 +35,7 @@ void MPU9250::ReadRegs( uint8_t ReadAddr, uint8_t *ReadBuf, unsigned int Bytes )
         ReadBuf[i] = SPI.transfer(0x00);
     deselect();
 
-    delayMicroseconds(10);
+    delayMicroseconds(50);
 }
 
 
@@ -194,7 +194,7 @@ unsigned int MPU9250::set_gyro_scale(int scale){
 
 unsigned int MPU9250::whoami(){
     unsigned int response;
-    response=WriteReg(MPUREG_WHOAMI|READ_FLAG, 0x00);
+    response = WriteReg(MPUREG_WHOAMI|READ_FLAG, 0x00);
     return response;
 }
 
@@ -295,7 +295,7 @@ uint8_t MPU9250::AK8963_whoami(){
     WriteReg(MPUREG_I2C_SLV0_CTRL, 0x81); //Read 1 byte from the magnetometer
 
     //WriteReg(MPUREG_I2C_SLV0_CTRL, 0x81);    //Enable I2C and set bytes
-    //delayMicroseconds(1000);
+    delayMicroseconds(100);
     response = WriteReg(MPUREG_EXT_SENS_DATA_00|READ_FLAG, 0x00);    //Read I2C 
     //ReadRegs(MPUREG_EXT_SENS_DATA_00,response,1);
     //response=WriteReg(MPUREG_I2C_SLV0_DO, 0x00);    //Read I2C 
