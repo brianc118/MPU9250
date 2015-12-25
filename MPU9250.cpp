@@ -18,7 +18,7 @@ unsigned int MPU9250::WriteReg( uint8_t WriteAddr, uint8_t WriteData )
     temp_val=SPI.transfer(WriteData);
     deselect();
 
-    delayMicroseconds(50);
+    //delayMicroseconds(50);
     return temp_val;
 }
 unsigned int  MPU9250::ReadReg( uint8_t WriteAddr, uint8_t WriteData )
@@ -35,7 +35,7 @@ void MPU9250::ReadRegs( uint8_t ReadAddr, uint8_t *ReadBuf, unsigned int Bytes )
         ReadBuf[i] = SPI.transfer(0x00);
     deselect();
 
-    delayMicroseconds(50);
+    //delayMicroseconds(50);
 }
 
 
@@ -55,12 +55,19 @@ void MPU9250::ReadRegs( uint8_t ReadAddr, uint8_t *ReadBuf, unsigned int Bytes )
 
 #define MPU_InitRegNum 17
 
-bool MPU9250::init(bool calib){
+bool MPU9250::init(bool calib_gyro, bool calib_acc){
     pinMode(my_cs, OUTPUT);
     digitalWriteFast(my_cs, HIGH);
+    float temp[3];
 
-    if(calib){
+    if(calib_gyro && calib_acc){
         calibrate(g_bias, a_bias);
+    }
+    else if(calib_gyro){
+        calibrate(g_bias, temp);
+    }
+    else if(calib_acc){
+        calibrate(temp, a_bias);
     }
     
     uint8_t i = 0;
@@ -68,10 +75,10 @@ bool MPU9250::init(bool calib){
         {BIT_H_RESET, MPUREG_PWR_MGMT_1},     // Reset Device
         {0x01, MPUREG_PWR_MGMT_1},     // Clock Source
         {0x00, MPUREG_PWR_MGMT_2},     // Enable Acc & Gyro
-        {low_pass_filter, MPUREG_CONFIG},         // Use DLPF set Gyroscope bandwidth 184Hz, temperature bandwidth 188Hz
+        {my_low_pass_filter, MPUREG_CONFIG},         // Use DLPF set Gyroscope bandwidth 184Hz, temperature bandwidth 188Hz
         {BITS_FS_250DPS, MPUREG_GYRO_CONFIG},    // +-250dps
         {BITS_FS_2G, MPUREG_ACCEL_CONFIG},   // +-2G
-        {0x09, MPUREG_ACCEL_CONFIG_2}, // Set Acc Data Rates, Enable Acc LPF , Bandwidth 184Hz
+        {my_low_pass_filter_acc, MPUREG_ACCEL_CONFIG_2}, // Set Acc Data Rates, Enable Acc LPF , Bandwidth 184Hz
         {0x30, MPUREG_INT_PIN_CFG},    //
         //{0x40, MPUREG_I2C_MST_CTRL},   // I2C Speed 348 kHz
         //{0x20, MPUREG_USER_CTRL},      // Enable AUX

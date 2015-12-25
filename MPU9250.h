@@ -207,7 +207,7 @@
 class MPU9250 {   
 public:
     // constructor. Default low pass filter of 188Hz
-    MPU9250(long clock, uint8_t cs, uint8_t low_pass_filter = BITS_DLPF_CFG_188HZ){
+    MPU9250(long clock, uint8_t cs, uint8_t low_pass_filter = BITS_DLPF_CFG_188HZ, uint8_t low_pass_filter_acc = BITS_DLPF_CFG_188HZ){
         my_clock = clock;
         my_cs = cs;
     }
@@ -215,7 +215,7 @@ public:
     unsigned int ReadReg(uint8_t WriteAddr, uint8_t WriteData );
     void ReadRegs(uint8_t ReadAddr, uint8_t *ReadBuf, unsigned int Bytes );
  
-    bool init(bool calib = true);
+    bool init(bool calib_gyro = true, bool calib_acc = true);
     void read_temp();
     void read_acc();
     void read_gyro();
@@ -250,7 +250,8 @@ public:
   private:
     long my_clock;
     uint8_t my_cs;
-    uint8_t low_pass_filter;
+    uint8_t my_low_pass_filter;
+    uint8_t my_low_pass_filter_acc;
 
     //float randomstuffs[3];
 
