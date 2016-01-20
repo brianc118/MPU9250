@@ -247,7 +247,7 @@ public:
 
     float randomstuff[3];   // seemed to be an issue with memory being disturbed so allocated random memory space here
 
-  private:
+private:
     long my_clock;
     uint8_t my_cs;
     uint8_t my_low_pass_filter;
