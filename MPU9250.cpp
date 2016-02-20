@@ -94,7 +94,11 @@ bool MPU9250::init(bool calib_gyro, bool calib_acc){
         {0x81, MPUREG_I2C_SLV0_CTRL},  //Enable I2C and set 1 byte
 
         {AK8963_CNTL1, MPUREG_I2C_SLV0_REG}, //I2C slave 0 register address from where to begin data transfer
+#ifdef AK8963FASTMODE
         {0x16, MPUREG_I2C_SLV0_DO}, // Register value to 100Hz continuous measurement in 16bit
+#else
+        {0x12, MPUREG_I2C_SLV0_DO}, // Register value to 8Hz continuous measurement in 16bit
+#endif
         {0x81, MPUREG_I2C_SLV0_CTRL}  //Enable I2C and set 1 byte
         
     };

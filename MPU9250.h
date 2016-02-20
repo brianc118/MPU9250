@@ -9,7 +9,9 @@
 #ifndef MPU9250_h
 #define MPU9250_h
 #include "Arduino.h"
- 
+
+// #define AK8963FASTMODE
+
 // mpu9250 registers
 #define MPUREG_XG_OFFS_TC 0x00
 #define MPUREG_YG_OFFS_TC 0x01
