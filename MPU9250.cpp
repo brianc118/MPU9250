@@ -57,7 +57,11 @@ void MPU9250::ReadRegs( uint8_t ReadAddr, uint8_t *ReadBuf, unsigned int Bytes )
 
 bool MPU9250::init(bool calib_gyro, bool calib_acc){
     pinMode(my_cs, OUTPUT);
+#ifdef CORE_TEENSY
     digitalWriteFast(my_cs, HIGH);
+#else
+    digitalWrite(my_cs, HIGH);
+#endif
     float temp[3];
 
     if(calib_gyro && calib_acc){
@@ -547,10 +551,18 @@ void MPU9250::calibrate(float *dest1, float *dest2){
 void MPU9250::select() {
     //Set CS low to start transmission (interrupts conversion)
     SPI.beginTransaction(SPISettings(my_clock, MSBFIRST, SPI_MODE3));
+#ifdef CORE_TEENSY
     digitalWriteFast(my_cs, LOW);
+#else
+    digitalWrite(my_cs, LOW);
+#endif
 }
 void MPU9250::deselect() {
     //Set CS high to stop transmission (restarts conversion)
+#ifdef CORE_TEENSY
     digitalWriteFast(my_cs, HIGH);
+#else
+    digitalWrite(my_cs, HIGH);
+#endif
     SPI.endTransaction();
 }
