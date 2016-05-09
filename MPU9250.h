@@ -212,6 +212,8 @@ public:
     MPU9250(long clock, uint8_t cs, uint8_t low_pass_filter = BITS_DLPF_CFG_188HZ, uint8_t low_pass_filter_acc = BITS_DLPF_CFG_188HZ){
         my_clock = clock;
         my_cs = cs;
+        my_low_pass_filter = low_pass_filter;
+        my_low_pass_filter_acc = low_pass_filter_acc;
     }
     unsigned int WriteReg(uint8_t WriteAddr, uint8_t WriteData );
     unsigned int ReadReg(uint8_t WriteAddr, uint8_t WriteData );
