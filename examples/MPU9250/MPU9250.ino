@@ -16,7 +16,6 @@
 
 #define SPI_CLOCK 8000000  // 8MHz clock works.
 
-#define SCK_PIN  14
 #define SS_PIN   10 
 #define INT_PIN  3
 #define LED      13
@@ -35,9 +34,8 @@ void setup() {
 
 	pinMode(INT_PIN, INPUT);
 	pinMode(LED, OUTPUT);
-	digitalWriteFast(LED, HIGH);
+	digitalWrite(LED, HIGH);
 
-	SPI.setSCK(SCK_PIN);
 	SPI.begin();
 
 	Serial.println("Press any key to continue");
