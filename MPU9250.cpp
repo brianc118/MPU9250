@@ -83,7 +83,7 @@ bool MPU9250::init(bool calib_gyro, bool calib_acc){
         {BITS_FS_250DPS, MPUREG_GYRO_CONFIG},    // +-250dps
         {BITS_FS_2G, MPUREG_ACCEL_CONFIG},       // +-2G
         {my_low_pass_filter_acc, MPUREG_ACCEL_CONFIG_2}, // Set Acc Data Rates, Enable Acc LPF , Bandwidth 184Hz
-        {0x30, MPUREG_INT_PIN_CFG},      //
+        {0x12, MPUREG_INT_PIN_CFG},      //
         //{0x40, MPUREG_I2C_MST_CTRL},   // I2C Speed 348 kHz
         //{0x20, MPUREG_USER_CTRL},      // Enable AUX
         {0x30, MPUREG_USER_CTRL},        // I2C Master mode and set I2C_IF_DIS to disable slave mode I2C bus
