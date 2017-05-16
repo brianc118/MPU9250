@@ -249,8 +249,6 @@ public:
     float mag_data[3];
     int16_t mag_data_raw[3];    
 
-    float randomstuff[3];   // seemed to be an issue with memory being disturbed so allocated random memory space here
-
 private:
     long my_clock;
     uint8_t my_cs;

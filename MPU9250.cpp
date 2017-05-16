@@ -419,8 +419,8 @@ void MPU9250::read_all(){
     }
     // Get Magnetometer value
     for(i=7; i < 10; i++) {
-        mag_data_raw[i] = ((int16_t)response[i*2+1]<<8) | response[i*2];
-        data = (float)mag_data_raw[i];
+        mag_data_raw[i-7] = ((int16_t)response[i*2+1]<<8) | response[i*2];
+        data = (float)mag_data_raw[i-7];
         mag_data[i-7] = data * Magnetometer_ASA[i-7];
     }
 }
